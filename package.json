@@ -1,0 +1,36 @@
+{
+  "name": "mylist",
+  "version": "1.0.0",
+  "main": "expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-native-community/datetimepicker": "8.3.0",
+    "@react-navigation/bottom-tabs": "^6.6.1",
+    "@react-navigation/native": "^6.1.18",
+    "expo": "^53.0.0",
+    "expo-font": "~13.3.1",
+    "expo-status-bar": "~2.2.3",
+    "prop-types": "^15.8.1",
+    "react": "19.0.0",
+    "react-native": "0.79.2",
+    "react-native-modal-datetime-picker": "^18.0.0",
+    "react-native-safe-area-context": "5.4.0",
+    "react-native-screens": "~4.10.0",
+    "react-native-uuid": "^2.0.2",
+    "react-native-vector-icons": "^10.2.0",
+    "yarn": "^1.22.22"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.2.45",
+    "@types/react-native-vector-icons": "^6.4.18",
+    "typescript": "^5.1.3"
+  },
+  "private": true
+}
