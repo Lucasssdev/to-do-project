@@ -45,7 +45,7 @@ const Main = () => {
           visible={controller.detailModalVisible} // Controla a visibilidade do modal de detalhes
           onClose={() => controller.setDetailModalVisible(false)} // Função para fechar o modal de detalhes
           task={controller.currentTask} // Tarefa atual para visualizar detalhes
-          onDelete={controller.deleteTask} // Função para deletar a tarefa
+          onDelete={controller.deleteTask} // Função para deletar a tarefas
           onEdit={(task) => {
             controller.setCurrentTask(task); // Atualiza a tarefa atual
             controller.setEditModalVisible(true); // Abre o modal de edição
