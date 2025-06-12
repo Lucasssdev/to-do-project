@@ -12,14 +12,43 @@ export function useControllerMain() {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]); // Armazenando as tarefas
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]); // Tarefas filtradas
   const [currentTask, setCurrentTask] = useState<Task | null>(null); // Tarefa atualmente selecionada
+  const [searchText, setSearchText] = useState(""); // Texto de pesquisa
+  const [totalTasks, setTotalTasks] = useState(0); // Total de tarefas
+  const [completedTasks, setCompletedTasks] = useState(0); // Tarefas completadas
 
   const server = new Storage(); // Instância do serviço de armazenamento de tarefas
 
   // Função assíncrona para buscar tarefas do servidor
   const getTasks = async () => {
-    const tasks = await server.getTasks(); // Chamada ao serviço para obter tarefas
-    setTasks(tasks); // Atualizando o estado com as tarefas recebidas
+    const allTasks = await server.getTasks(); // Chamada ao serviço para obter tarefas
+    setTasks(allTasks); // Atualizando o estado com as tarefas recebidas
+    setFilteredTasks(allTasks); // Inicialmente, tarefas filtradas = todas as tarefas
+
+    // Atualiza estatísticas
+    setTotalTasks(allTasks.length);
+    setCompletedTasks(allTasks.filter((task) => task.completed).length);
+  };
+
+  // Função de pesquisa
+  const handleSearch = (text: string) => {
+    setSearchText(text);
+
+    if (!text.trim()) {
+      setFilteredTasks(tasks); // Se não houver texto, mostrar todas as tarefas
+      return;
+    }
+
+    // Filtra tarefas com base no texto de pesquisa
+    const filtered = tasks.filter(
+      (task) =>
+        task.name.toLowerCase().includes(text.toLowerCase()) ||
+        (task.description &&
+          task.description.toLowerCase().includes(text.toLowerCase()))
+    );
+
+    setFilteredTasks(filtered);
   };
 
   // Efeito que será executado quando o componente ganhar foco
@@ -113,6 +142,7 @@ export function useControllerMain() {
     detailModalVisible,
     setDetailModalVisible,
     tasks,
+    filteredTasks,
     currentTask,
     setCurrentTask,
     toggleTaskCompletion,
@@ -120,5 +150,9 @@ export function useControllerMain() {
     onCloseModal,
     editTask,
     deleteTask,
+    handleSearch,
+    searchText,
+    totalTasks,
+    completedTasks,
   };
 }

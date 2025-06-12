@@ -11,5 +11,6 @@ export const themas = {
     backgroundModal: "rgba(0, 0, 0, 0.5)",
     yellow: "#ffd700",
     green: "#0bae0b",
+    blue: "#2FA7F7",
   },
 };

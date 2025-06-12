@@ -7,6 +7,7 @@ export const style = StyleSheet.create({
     padding: 20,
     backgroundColor: themas.colors.grayBackground,
   },
+
   taskContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -55,5 +56,16 @@ export const style = StyleSheet.create({
     fontSize: 16,
     color: themas.colors.lightGray,
     marginTop: 20,
+  },
+  // Novos estilos para as estatísticas
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+  },
+  statsText: {
+    fontSize: 14,
+    color: themas.colors.lightGray,
+    marginRight: 8,
   },
 });
