@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Main from "../app/main";
-import Search from "../app/search";
+import Analytics from "../components/analytics";
 import { StatusBar } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { themas } from "../global/themes";
@@ -17,8 +17,8 @@ export default function Routes() {
           const iconName =
             route.name === "MyList"
               ? "list-outline"
-              : route.name === "Search" // condições para definir o icon de cada pagina
-              ? "search-outline"
+              : route.name === "Analytics"
+              ? "bar-chart-outline"
               : "bug-outline";
 
           return {
@@ -27,7 +27,7 @@ export default function Routes() {
             ),
             tabBarActiveTintColor: themas.colors.red,
             tabBarInactiveTintColor: themas.colors.lightGray,
-            headerTintColor: themas.colors.red, // style para o title da pagina e a navegação das paginas
+            headerTintColor: themas.colors.red,
             headerTitleStyle: {
               fontWeight: "bold",
               fontSize: 20,
@@ -46,7 +46,11 @@ export default function Routes() {
         }}
       >
         <Tab.Screen name="MyList" component={Main} />
-        <Tab.Screen name="Search" component={Search} />
+        <Tab.Screen
+          name="Analytics"
+          component={Analytics}
+          options={{ title: "Análise de Tarefas" }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   );

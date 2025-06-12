@@ -11,32 +11,16 @@ import SearchBar from "../../components/searchBar";
 const Main = () => {
   const controller = useControllerMain();
 
-  // Componente para exibir estatísticas como informação extra
-  const TaskStats = () => (
-    <View style={style.statsContainer}>
-      <Text style={style.statsText}>
-        Total: {controller.totalTasks} tarefas
-      </Text>
-      <Text style={style.statsText}>
-        Concluídas: {controller.completedTasks}
-      </Text>
-      <Text style={style.statsText}>
-        Pendentes: {controller.totalTasks - controller.completedTasks}
-      </Text>
-    </View>
-  );
-
   return (
     <View style={style.container}>
-      {/* Barra de pesquisa acima da lista */}
+      {/* Barra de pesquisa acima da lista - sem informações estatísticas */}
       <SearchBar
         onSearch={controller.handleSearch}
         placeholder="Buscar por nome ou descrição..."
-        extraInfo={<TaskStats />}
       />
 
       <FlatList
-        data={controller.filteredTasks} // Usando as tarefas filtradas aqui
+        data={controller.filteredTasks}
         renderItem={controller.renderTask}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={style.taskList}

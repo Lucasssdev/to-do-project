@@ -1,16 +1,9 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  Dimensions,
-  TouchableOpacity,
-} from "react-native";
-import { PieChart, BarChart, LineChart } from "react-native-chart-kit";
+import React, { useState, useCallback } from "react";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { styles } from "./style";
 import Storage, { Task } from "../../server/taskService";
-
-const windowWidth = Dimensions.get("window").width;
+import { useFocusEffect } from "@react-navigation/native";
+import { themas } from "../../global/themes";
 
 const Analytics = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -20,22 +13,24 @@ const Analytics = () => {
   const [totalTasks, setTotalTasks] = useState(0);
   const [completedTasks, setCompletedTasks] = useState(0);
   const [pendingTasks, setPendingTasks] = useState(0);
-  const [chartData, setChartData] = useState({
-    pieData: [],
-    barData: { labels: [], datasets: [{ data: [] }] },
-    lineData: { labels: [], datasets: [{ data: [] }] },
+  const [activityData, setActivityData] = useState({
+    weeklyActivity: Array(7).fill(0),
+    monthlyActivity: Array(6).fill(0),
+    yearlyActivity: Array(12).fill(0),
   });
 
   // Instanciar o serviço de storage
   const storage = new Storage();
 
-  // Buscar tarefas ao montar o componente
-  useEffect(() => {
-    loadTasks();
-  }, []);
+  // Buscar tarefas ao montar o componente ou quando a tela receber foco
+  useFocusEffect(
+    useCallback(() => {
+      loadTasks();
+    }, [])
+  );
 
   // Processar dados sempre que as tarefas ou filtro de tempo mudar
-  useEffect(() => {
+  React.useEffect(() => {
     processTaskData();
   }, [tasks, timeFilter]);
 
@@ -49,174 +44,58 @@ const Analytics = () => {
     }
   };
 
-  // Processar dados das tarefas para os gráficos
+  // Processar dados das tarefas
   const processTaskData = () => {
     if (!tasks.length) return;
 
-    // Calcular estatísticas básicas
-    const completed = tasks.filter((task) => task.completed).length;
+    // Contagem básica de tarefas
+    const completed = tasks.filter((task) => task.completed === true).length;
     const pending = tasks.length - completed;
 
     setTotalTasks(tasks.length);
     setCompletedTasks(completed);
     setPendingTasks(pending);
 
-    // Dados para o gráfico de pizza
-    const pieData = [
-      {
-        name: "Concluídas",
-        population: completed,
-        color: "green",
-        legendFontColor: "#7F7F7F",
-        legendFontSize: 15,
-      },
-      {
-        name: "Pendentes",
-        population: pending,
-        color: "red",
-        legendFontColor: "#7F7F7F",
-        legendFontSize: 15,
-      },
-    ];
-
-    // Preparar dados para gráficos temporais
-    let labels = [];
-    let completedData = [];
-    let createdData = [];
-
-    // Definir período de tempo com base no filtro
-    const now = new Date();
-    let startDate: Date;
-
-    switch (timeFilter) {
-      case "week":
-        startDate = new Date(now);
-        startDate.setDate(now.getDate() - 7);
-        labels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-        break;
-      case "month":
-        startDate = new Date(now);
-        startDate.setDate(now.getDate() - 30);
-        // Criar labels para últimos 30 dias em grupos de 5 dias
-        for (let i = 0; i < 6; i++) {
-          const date = new Date(now);
-          date.setDate(now.getDate() - 5 * i);
-          labels.unshift(date.getDate() + "/" + (date.getMonth() + 1));
-        }
-        break;
-      case "year":
-        startDate = new Date(now);
-        startDate.setMonth(now.getMonth() - 12);
-        // Labels para os últimos 12 meses
-        const monthNames = [
-          "Jan",
-          "Fev",
-          "Mar",
-          "Abr",
-          "Mai",
-          "Jun",
-          "Jul",
-          "Ago",
-          "Set",
-          "Out",
-          "Nov",
-          "Dez",
-        ];
-        for (let i = 0; i < 12; i++) {
-          const monthIndex = (now.getMonth() - i + 12) % 12;
-          labels.unshift(monthNames[monthIndex]);
-        }
-        break;
-    }
-
-    // Inicializar arrays de dados com zeros
-    const dataLength = labels.length;
-    for (let i = 0; i < dataLength; i++) {
-      completedData[i] = 0;
-      createdData[i] = 0;
-    }
+    // Inicializar arrays para atividade
+    const weeklyActivity = Array(7).fill(0);
+    const monthlyActivity = Array(6).fill(0);
+    const yearlyActivity = Array(12).fill(0);
 
     // Preencher dados de acordo com o filtro de tempo
     tasks.forEach((task) => {
       const taskDate = new Date(task.dateCreated);
+      const now = new Date();
 
-      if (timeFilter === "week") {
-        // Agrupar por dia da semana
-        const dayIndex = taskDate.getDay(); // 0 = Domingo, 6 = Sábado
-        createdData[dayIndex]++;
+      // Atividade semanal (por dia da semana)
+      const dayOfWeek = taskDate.getDay();
+      weeklyActivity[dayOfWeek]++;
 
-        if (task.completed && task.dateFinish) {
-          const completeDate = new Date(task.dateFinish);
-          const completeDayIndex = completeDate.getDay();
-          completedData[completeDayIndex]++;
-        }
-      } else if (timeFilter === "month") {
-        // Agrupar por períodos de 5 dias nos últimos 30 dias
-        const daysAgo = Math.floor(
-          (now.getTime() - taskDate.getTime()) / (1000 * 3600 * 24)
-        );
-        if (daysAgo <= 30) {
-          const groupIndex = Math.min(Math.floor(daysAgo / 5), 5);
-          createdData[5 - groupIndex]++;
+      // Atividade mensal (últimos 6 períodos de 5 dias)
+      const dayOfMonth = taskDate.getDate(); // 1 a 31
 
-          if (task.completed && task.dateFinish) {
-            const completeDate = new Date(task.dateFinish);
-            const completeDaysAgo = Math.floor(
-              (now.getTime() - completeDate.getTime()) / (1000 * 3600 * 24)
-            );
-            if (completeDaysAgo <= 30) {
-              const completeGroupIndex = Math.min(
-                Math.floor(completeDaysAgo / 5),
-                5
-              );
-              completedData[5 - completeGroupIndex]++;
-            }
-          }
-        }
-      } else if (timeFilter === "year") {
-        // Agrupar por mês nos últimos 12 meses
-        if (taskDate >= startDate) {
-          const monthsAgo = (now.getMonth() - taskDate.getMonth() + 12) % 12;
-          createdData[11 - monthsAgo]++;
+      // Determinando o grupo (1-5, 6-10, etc)
+      let groupIndex;
+      if (dayOfMonth <= 5) groupIndex = 0;
+      else if (dayOfMonth <= 10) groupIndex = 1;
+      else if (dayOfMonth <= 15) groupIndex = 2;
+      else if (dayOfMonth <= 20) groupIndex = 3;
+      else if (dayOfMonth <= 25) groupIndex = 4;
+      else groupIndex = 5; // 26-30/31
 
-          if (task.completed && task.dateFinish) {
-            const completeDate = new Date(task.dateFinish);
-            if (completeDate >= startDate) {
-              const completeMonthsAgo =
-                (now.getMonth() - completeDate.getMonth() + 12) % 12;
-              completedData[11 - completeMonthsAgo]++;
-            }
-          }
-        }
+      monthlyActivity[groupIndex]++;
+
+      // Atividade anual (por mês)
+      const currentYear = now.getFullYear();
+      const taskYear = taskDate.getFullYear();
+
+      if (taskYear === currentYear) {
+        // Usar o mês diretamente para indexar (0 = Jan, 11 = Dez)
+        const month = taskDate.getMonth();
+        yearlyActivity[month]++;
       }
     });
 
-    // Configurar dados para os gráficos
-    const barData = {
-      labels,
-      datasets: [
-        {
-          data: createdData,
-          color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
-          strokeWidth: 2,
-        },
-      ],
-      legend: ["Tarefas Criadas"],
-    };
-
-    const lineData = {
-      labels,
-      datasets: [
-        {
-          data: completedData,
-          color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
-          strokeWidth: 2,
-        },
-      ],
-      legend: ["Tarefas Concluídas"],
-    };
-
-    setChartData({ pieData, barData, lineData });
+    setActivityData({ weeklyActivity, monthlyActivity, yearlyActivity });
   };
 
   // Calcular a taxa de conclusão (porcentagem)
@@ -227,37 +106,106 @@ const Analytics = () => {
 
   // Obter média de tarefas concluídas por dia na última semana
   const getDailyAverage = () => {
-    if (!tasks.length) return 0;
+    if (!tasks.length) return "0.0";
 
     const lastWeek = new Date();
     lastWeek.setDate(lastWeek.getDate() - 7);
 
     const completedLastWeek = tasks.filter(
-      (task) =>
-        task.completed &&
-        task.dateFinish &&
-        new Date(task.dateFinish) >= lastWeek
+      (task) => task.completed && new Date(task.dateCreated) >= lastWeek
     ).length;
 
     return (completedLastWeek / 7).toFixed(1);
   };
 
-  // Configuração comum para os gráficos
-  const chartConfig = {
-    backgroundColor: "#ffffff",
-    backgroundGradientFrom: "#ffffff",
-    backgroundGradientTo: "#ffffff",
-    decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    style: {
-      borderRadius: 16,
-    },
-    propsForDots: {
-      r: "6",
-      strokeWidth: "2",
-      stroke: "#ffa726",
-    },
+  // Determinar cor com base na intensidade
+  const getIntensityColor = (value, maxValue) => {
+    if (value === 0) return themas.colors.white;
+    const intensity = maxValue > 0 ? value / maxValue : 0;
+    if (intensity < 0.25) return "rgba(76, 175, 80, 0.2)";
+    if (intensity < 0.5) return "rgba(76, 175, 80, 0.5)";
+    if (intensity < 0.75) return "rgba(76, 175, 80, 0.7)";
+    return "rgba(76, 175, 80, 1.0)";
+  };
+
+  // Renderizar células de atividade
+  const renderActivityCells = () => {
+    const currentActivityData =
+      timeFilter === "week"
+        ? activityData.weeklyActivity
+        : timeFilter === "month"
+        ? activityData.monthlyActivity
+        : activityData.yearlyActivity;
+
+    const labels =
+      timeFilter === "week"
+        ? ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+        : timeFilter === "month"
+        ? ["1-5", "6-10", "11-15", "16-20", "21-25", "26-31"]
+        : [
+            "Jan",
+            "Fev",
+            "Mar",
+            "Abr",
+            "Mai",
+            "Jun",
+            "Jul",
+            "Ago",
+            "Set",
+            "Out",
+            "Nov",
+            "Dez",
+          ];
+
+    const maxValue = Math.max(...currentActivityData);
+
+    return (
+      <View style={styles.activityContainer}>
+        {currentActivityData.map((value, index) => (
+          <View
+            key={index}
+            style={[
+              styles.activityItem,
+              {
+                width:
+                  timeFilter === "year"
+                    ? "8.3%"
+                    : timeFilter === "month"
+                    ? "16.6%"
+                    : "14.2%",
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.activityCell,
+                { backgroundColor: getIntensityColor(value, maxValue) },
+              ]}
+            >
+              <Text style={styles.activityValue}>{value}</Text>
+            </View>
+            <Text style={styles.activityLabel}>{labels[index]}</Text>
+          </View>
+        ))}
+      </View>
+    );
+  };
+
+  // Renderizar barra de progresso
+  const renderProgressBar = () => {
+    const percentage = getCompletionRate();
+    return (
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBarContainer}>
+          <View style={[styles.progressBar, { width: `${percentage}%` }]} />
+        </View>
+        <View style={styles.progressLabelContainer}>
+          <Text style={styles.progressLabel}>Completadas</Text>
+          <Text style={styles.progressValue}>{percentage}%</Text>
+          <Text style={styles.progressLabel}>Pendentes</Text>
+        </View>
+      </View>
+    );
   };
 
   return (
@@ -273,7 +221,14 @@ const Analytics = () => {
           ]}
           onPress={() => setTimeFilter("week")}
         >
-          <Text style={styles.timeFilterText}>Semana</Text>
+          <Text
+            style={[
+              styles.timeFilterText,
+              timeFilter === "week" && styles.activeFilterText,
+            ]}
+          >
+            Semana
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -282,7 +237,14 @@ const Analytics = () => {
           ]}
           onPress={() => setTimeFilter("month")}
         >
-          <Text style={styles.timeFilterText}>Mês</Text>
+          <Text
+            style={[
+              styles.timeFilterText,
+              timeFilter === "month" && styles.activeFilterText,
+            ]}
+          >
+            Mês
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -291,7 +253,14 @@ const Analytics = () => {
           ]}
           onPress={() => setTimeFilter("year")}
         >
-          <Text style={styles.timeFilterText}>Ano</Text>
+          <Text
+            style={[
+              styles.timeFilterText,
+              timeFilter === "year" && styles.activeFilterText,
+            ]}
+          >
+            Ano
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -302,11 +271,15 @@ const Analytics = () => {
           <Text style={styles.statsLabel}>Total</Text>
         </View>
         <View style={styles.statsCard}>
-          <Text style={styles.statsValue}>{completedTasks}</Text>
+          <Text style={[styles.statsValue, { color: themas.colors.green }]}>
+            {completedTasks}
+          </Text>
           <Text style={styles.statsLabel}>Concluídas</Text>
         </View>
         <View style={styles.statsCard}>
-          <Text style={styles.statsValue}>{pendingTasks}</Text>
+          <Text style={[styles.statsValue, { color: themas.colors.red }]}>
+            {pendingTasks}
+          </Text>
           <Text style={styles.statsLabel}>Pendentes</Text>
         </View>
         <View style={styles.statsCard}>
@@ -319,56 +292,45 @@ const Analytics = () => {
         </View>
       </View>
 
-      {/* Gráfico de pizza - Status das tarefas */}
+      {/* Visualização de status das tarefas */}
       {tasks.length > 0 && (
         <View style={styles.chartContainer}>
           <Text style={styles.chartTitle}>Status das Tarefas</Text>
-          <PieChart
-            data={chartData.pieData}
-            width={windowWidth - 40}
-            height={200}
-            chartConfig={chartConfig}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute
-          />
+          {renderProgressBar()}
+          <View style={styles.legendContainer}>
+            <View style={styles.legendItem}>
+              <View
+                style={[
+                  styles.legendDot,
+                  { backgroundColor: themas.colors.green },
+                ]}
+              />
+              <Text>Concluídas: {completedTasks}</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View
+                style={[
+                  styles.legendDot,
+                  { backgroundColor: themas.colors.red },
+                ]}
+              />
+              <Text>Pendentes: {pendingTasks}</Text>
+            </View>
+          </View>
         </View>
       )}
 
-      {/* Gráfico de barras - Tarefas criadas por período */}
+      {/* Visualização de atividade */}
       {tasks.length > 0 && (
         <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Tarefas Criadas</Text>
-          <BarChart
-            data={chartData.barData}
-            width={windowWidth - 40}
-            height={220}
-            yAxisLabel=""
-            chartConfig={{
-              ...chartConfig,
-              color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
-            }}
-            verticalLabelRotation={30}
-          />
-        </View>
-      )}
-
-      {/* Gráfico de linha - Tarefas concluídas por período */}
-      {tasks.length > 0 && (
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Tarefas Concluídas</Text>
-          <LineChart
-            data={chartData.lineData}
-            width={windowWidth - 40}
-            height={220}
-            chartConfig={{
-              ...chartConfig,
-              color: (opacity = 1) => `rgba(0, 128, 0, ${opacity})`,
-            }}
-            bezier
-            verticalLabelRotation={30}
-          />
+          <Text style={styles.chartTitle}>
+            {timeFilter === "week"
+              ? "Atividade por Dia da Semana"
+              : timeFilter === "month"
+              ? "Atividade nos Últimos 30 Dias"
+              : "Atividade por Mês"}
+          </Text>
+          {renderActivityCells()}
         </View>
       )}
 
