@@ -133,6 +133,10 @@ export function useControllerMain() {
     getTasks(); // Atualiza a lista de tarefas
   };
 
+  const loadTasks = async () => {
+    await getTasks(); // Carrega as tarefas
+  };
+
   // Retorna as funções e estados para serem usados no componente principal
   return {
     modalVisible,
@@ -154,5 +158,6 @@ export function useControllerMain() {
     searchText,
     totalTasks,
     completedTasks,
+    loadTasks, // Certifique-se de que loadTasks está incluído aqui
   };
 }

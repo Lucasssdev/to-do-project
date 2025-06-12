@@ -43,9 +43,9 @@ export const style = StyleSheet.create({
   },
   absoluteButtonContainer: {
     position: "absolute",
-    bottom: 30,
-    left: 20,
+    bottom: 20,
     right: 20,
+    flexDirection: "row", // Altere para linha para colocar botões lado a lado
     alignItems: "center",
   },
   taskList: {
@@ -67,5 +67,32 @@ export const style = StyleSheet.create({
     fontSize: 14,
     color: themas.colors.lightGray,
     marginRight: 8,
+  },
+  testButton: {
+    backgroundColor: themas.colors.blue,
+    padding: 10,
+    borderRadius: 8,
+    marginHorizontal: 20,
+    marginVertical: 10,
+    alignItems: "center",
+  },
+  testButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  clearButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: themas.colors.red,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 15, // Espaço entre os botões
+    elevation: 5,
+  },
+  clearButtonText: {
+    color: themas.colors.white,
+    fontSize: 24,
+    fontWeight: "bold",
   },
 });
