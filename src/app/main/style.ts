@@ -44,9 +44,32 @@ export const style = StyleSheet.create({
   absoluteButtonContainer: {
     position: "absolute",
     bottom: 20,
-    right: 20,
-    flexDirection: "row", // Altere para linha para colocar botões lado a lado
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "center", // Centraliza os botões horizontalmente
     alignItems: "center",
+  },
+  addButton: {
+    width: 60, // Um pouco maior que o botão de limpar
+    height: 60, // Um pouco maior que o botão de limpar
+    borderRadius: 30,
+    backgroundColor: themas.colors.blue,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+    zIndex: 2, // Garante que fique visualmente à frente
+  },
+  clearButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: themas.colors.red,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute", // Posiciona absolutamente dentro do container
+    right: 20, // Distância da borda direita
+    elevation: 5,
   },
   taskList: {
     paddingBottom: 100,
@@ -79,16 +102,6 @@ export const style = StyleSheet.create({
   testButtonText: {
     color: "#fff",
     fontWeight: "bold",
-  },
-  clearButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: themas.colors.red,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 15, // Espaço entre os botões
-    elevation: 5,
   },
   clearButtonText: {
     color: themas.colors.white,

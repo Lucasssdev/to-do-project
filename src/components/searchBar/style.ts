@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { themas } from "../../global/themes";
 
 export const styles = StyleSheet.create({
   container: {
@@ -23,7 +24,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   searchButton: {
-    backgroundColor: "red",
+    backgroundColor: themas.colors.red,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 6,

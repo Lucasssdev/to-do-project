@@ -6,7 +6,7 @@ export const themas = {
     lightGray: "#666",
     midGray: "#999",
     black: "#000000",
-    red: "#dd1b1b",
+    red: "#fe3939",
     grayBackground: "#f0f0f0",
     backgroundModal: "rgba(0, 0, 0, 0.5)",
     yellow: "#ffd700",
