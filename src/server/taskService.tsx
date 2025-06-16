@@ -168,6 +168,102 @@ class Storage {
     const tasks = await this.loadTasks(); // Carrega as tarefas
     return tasks; // Retorna as tarefas carregadas
   }
+
+  // Método assíncrono para gerar tarefas de teste
+  public async generateTestTasks() {
+    try {
+      // Nomes de tarefas de exemplo
+      const taskNames = [
+        "Responder e-mails",
+        "Reunião com equipe",
+        "Preparar apresentação",
+        "Revisar documentação",
+        "Fazer backup de arquivos",
+        "Atualizar planilha de orçamento",
+        "Marcar consulta médica",
+        "Comprar mantimentos",
+        "Pagar contas do mês",
+        "Limpar área de trabalho",
+        "Estudar novo framework",
+        "Fazer exercícios físicos",
+        "Organizar agenda da semana",
+        "Ligar para cliente",
+        "Planejar viagem",
+      ];
+
+      // Criar 15 tarefas com datas e status variados
+      const tasks = [];
+      const now = new Date();
+
+      for (let i = 0; i < 15; i++) {
+        // Gerar data aleatória nos últimos 30 dias
+        const randomDaysAgo = Math.floor(Math.random() * 30);
+        const date = new Date();
+        date.setDate(now.getDate() - randomDaysAgo);
+
+        // Formatação de data (ex: 2023-06-12)
+        const dateStr = date.toISOString().split("T")[0];
+
+        // 60% das tarefas serão marcadas como concluídas
+        const isCompleted = Math.random() < 0.6;
+
+        // Data de conclusão (apenas para tarefas concluídas)
+        let completionDate = null;
+        if (isCompleted) {
+          // Concluída 1-3 dias após a criação
+          const completionDaysAfter = Math.floor(Math.random() * 3) + 1;
+          const completeDate = new Date(date);
+          completeDate.setDate(date.getDate() + completionDaysAfter);
+          completionDate = completeDate.toISOString().split("T")[0];
+        }
+
+        // Criar tarefa - use name em vez de title
+        const task = {
+          id: `test-${Date.now()}-${i}`,
+          name: taskNames[i], // Use name em vez de title para corresponder ao seu modelo
+          description: `Esta é uma tarefa de teste gerada automaticamente (#${
+            i + 1
+          })`,
+          completed: isCompleted,
+          dateCreated: dateStr,
+          dateFinish: completionDate,
+          priority: Math.floor(Math.random() * 3) + 1, // 1, 2 ou 3
+        };
+
+        tasks.push(task);
+
+        // Salvar no AsyncStorage
+        await AsyncStorage.setItem(`@task_${task.id}`, JSON.stringify(task));
+      }
+
+      return tasks;
+    } catch (error) {
+      console.error("Erro ao gerar tarefas de teste:", error);
+      Alert.alert("Erro", "Não foi possível gerar tarefas de teste");
+      return [];
+    }
+  }
+
+  // Método assíncrono para limpar todas as tarefas
+  public async clearAllTasks() {
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      const taskKeys = keys.filter((key) => key.startsWith("@task_"));
+
+      if (taskKeys.length === 0) {
+        Alert.alert("Info", "Não há tarefas para limpar.");
+        return false;
+      }
+
+      // Remover todas as tarefas
+      await AsyncStorage.multiRemove(taskKeys);
+      return true;
+    } catch (error) {
+      console.error("Erro ao limpar todas as tarefas:", error);
+      Alert.alert("Erro", "Não foi possível limpar as tarefas");
+      return false;
+    }
+  }
 }
 
 export default Storage; // Exporta a classe Storage como padrão
