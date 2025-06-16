@@ -1,14 +1,9 @@
-# Checklist App
+# MyList App
 
-## Índice
+**Trabalho de Desenvolvimento de Aplicativos Móveis**
+**BCC - 7º periodo**
 
-1. [Descrição](#descrição)
-2. [Funcionalidades](#funcionalidades)
-3. [Tecnologias](#tecnologias)
-4. [Instalação e Execução](#instalação-e-execução)
-5. [Documentação do Código](#documentação-do-código)
-6. [Demonstração](#demonstração)
-7. [Estrutura de Pastas do Projeto](#estrutura-de-pastas-do-projeto)
+## Alunos: Lucas Lemos, Joao Pedro Souza e Angelo Favero
 
 ## Descrição
 
@@ -16,46 +11,50 @@ Este é um aplicativo de checklist desenvolvido em React Native. O objetivo prin
 
 ## Funcionalidades
 
-- **Criar checklists**: Permite a criação de novas listas de tarefas.
-- **Editar e excluir checklists**: Os checklists existentes podem ser modificados ou removidos.
-- **Marcar tarefas como concluídas**: Cada item pode ser marcado como concluído ou não.
-- **Persistência de dados**: As listas e tarefas são salvas localmente e permanecem acessíveis após o fechamento do aplicativo.
+- **Listagem e pesquisa de tarefas**
+- **Criação de tarefas**
+- **Edição e exclusão de tarefas**
+- **Marcar/desmarcar tarefas como concluídas**
+- **Tela de métricas**:
 
 ## Tecnologias
 
 - **React Native**: Framework principal para desenvolvimento do aplicativo móvel.
 - **Async Storage** (ou outra tecnologia de armazenamento local) para persistência de dados no dispositivo.
+- **React Navigation** para navegação entre telas.
+- **Styde Components** para estilização dos componentes.
+- **Expo** para execução do aplicativo em um dispositivo móvel.
 
 ## Instalação e Execução
 
 1. **Clone o repositório**
 
    ```bash
-   git clone https://github.com/DevGuiPereira/ListaDeTarefas
-   cd ListaDeTarefas/MyList
+   git clone https://github.com/Lucasssdev/to-do-project.git
 
-   - Instale o Expo CLI (se ainda não o tiver): 
-   
+   - Instale o Expo CLI (se ainda não o tiver):
+
    npm install -g expo-cli
 
-   - Instale as dependências: 
+   - Instale as dependências:
 
    npm install
 
    -Execute o aplicativo com Expo:
 
-   expo start
+   npx expo start
 
    Use o Expo Go ou um Emulador mobile.
+   ```
 
 ## Documentação do Código
 
 Abaixo estão algumas das seções principais do código:
 
-- **Tela Principal**: Exibe a lista de checklists e botões para adicionar, editar ou excluir listas.
-- **Página de Pesquisa**: Permite buscar tarefas específicas dentro dos checklists.
+- **Tela Principal**: Exibe a lista de checklists e botões para adicionar, editar ou excluir e pesquisar tarefas.
 - **Modal de Criação de Tarefas**: Formulário para criar novas tarefas.
 - **Modal de Edição de Tarefas**: Formulário para editar tarefas existentes.
+- **Tela de Métricas**: Exibe estatísticas sobre o número de tarefas concluídas e não concluídas.
 
 As funcionalidades principais foram desenvolvidas usando `React Hooks` para gerenciamento de estado e `Async Storage` para a persistência dos dados localmente.
 
@@ -81,11 +80,3 @@ As funcionalidades principais foram desenvolvidas usando `React Hooks` para gere
    - **global/** - Contém cores utilizadas no Projeto.
    - **routes** - Contém as rotas das páginas.
    - **server/** - pasta que contem as funções de manipulação de dados.
-
-## Demonstração
-
-Assista à demonstração da implementação no [Loom Video](https://www.loom.com/share/26374ddd821d4c12a29f65c2833aadaf?sid=f84c0569-d354-471f-861c-8f702d67727f), onde é abordada a parte mais relevante do código.
-
-[Vídeo do Aplicativo no Expo Go](https://github.com/user-attachments/assets/5b29ca9a-083c-4925-9bef-c25569b64820).
-
-
